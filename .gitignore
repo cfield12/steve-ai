@@ -1,0 +1,7 @@
+*.serverless
+*.terraform.lock.hcl
+*.terraform
+*terraform.*
+/tmp
+scripts/*
+deployment/*

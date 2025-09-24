@@ -1,0 +1,54 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: cfield12
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: steve-ai
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: knowledge-base-api
+
+provider:
+  name: aws
+  runtime: python3.11
+  stage: dev
+  region: eu-west-2
+  environment:
+    KNOWLEDGE_BASE_ID: ${env:KNOWLEDGE_BASE_ID, self:custom.knowledgeBaseID}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "bedrock:InvokeModel"
+            - "bedrock:Retrieve"
+            - "bedrock:RetrieveAndGenerate"
+          Resource: "*"
+
+custom:
+  knowledgeBaseID: "LTOA1ZYJ5F"
+  lambdaLayerS3BucketName: "knowledgebase-steve-ai"
+
+functions:
+  invokeKnowledgeBase:
+    handler: handler.lambda_handler
+    memorySize: 256
+    timeout: 60
+    layers:
+      - { Ref: DeployKnowledgeBaseLambdaLayer }
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+resources:
+  Resources:
+    DeployKnowledgeBaseLambdaLayer:
+      Type: AWS::Lambda::LayerVersion
+      Properties:
+        LayerName: KnowledgeBaseLambdaLayer
+        Description: Knowledge Base Lambda Layer
+        Content:
+          S3Bucket: ${self:custom.lambdaLayerS3BucketName}
+          S3Key: lambdalayer/knowledgebase_lambdalayer.zip
+        CompatibleRuntimes:
+          - python3.12
+          - python3.11
+          - python3.10

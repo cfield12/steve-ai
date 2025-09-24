@@ -1,0 +1,154 @@
+name: Build and Deploy Steve AI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: eu-west-2
+  TF_VERSION: 1.6.0
+  NODE_VERSION: 18
+
+jobs:
+  terraform:
+    name: Deploy Terraform Infrastructure
+    runs-on: ubuntu-latest
+    outputs:
+      knowledge_base_id: ${{ steps.terraform-output.outputs.knowledge_base_id }}
+      knowledge_base_arn: ${{ steps.terraform-output.outputs.knowledge_base_arn }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Terraform Format Check
+      run: terraform fmt -check -recursive
+      working-directory: ./infrastructure
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./infrastructure
+
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: ./infrastructure
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+      working-directory: ./infrastructure
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tfplan
+      working-directory: ./infrastructure
+
+    - name: Terraform Plan (PR)
+      if: github.event_name == 'pull_request'
+      run: terraform plan
+      working-directory: ./infrastructure
+
+    - name: Get Terraform Outputs
+      id: terraform-output
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "knowledge_base_id=$(terraform output -raw knowledge_base_id)" >> $GITHUB_OUTPUT
+        echo "knowledge_base_arn=$(terraform output -raw knowledge_base_arn)" >> $GITHUB_OUTPUT
+      working-directory: ./infrastructure
+
+  serverless:
+    name: Deploy Serverless API
+    needs: terraform
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && needs.terraform.outputs.knowledge_base_id != ''
+    outputs:
+      api_endpoint: ${{ steps.serverless-output.outputs.api_endpoint }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Install Serverless Framework
+      run: npm install -g serverless
+
+    - name: Set Environment Variables
+      run: |
+        # Set environment variables for Serverless deployment
+        echo "KNOWLEDGE_BASE_ID=${{ needs.terraform.outputs.knowledge_base_id }}" >> $GITHUB_ENV
+        echo "S3_BUCKET_NAME=$(terraform output -raw s3_bucket_id)" >> $GITHUB_ENV
+        
+        echo "Environment variables set for Serverless deployment"
+        echo "Knowledge Base ID: ${{ needs.terraform.outputs.knowledge_base_id }}"
+      working-directory: ./infrastructure
+
+    - name: Install Serverless dependencies
+      run: npm install
+      working-directory: ./steve-ai
+
+    - name: Deploy Serverless API
+      run: serverless deploy --verbose
+      working-directory: ./steve-ai
+
+    - name: Get API Endpoint
+      id: serverless-output
+      run: |
+        cd steve-ai
+        ENDPOINT=$(serverless info --verbose | grep "endpoint:" | awk '{print $2}')
+        echo "api_endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
+        echo "API Endpoint: $ENDPOINT"
+
+    - name: Test API Endpoint
+      run: |
+        if [ -n "${{ steps.serverless-output.outputs.api_endpoint }}" ]; then
+          echo "Testing API endpoint: ${{ steps.serverless-output.outputs.api_endpoint }}"
+          curl -s "${{ steps.serverless-output.outputs.api_endpoint }}?question=Test%20question&session_id=github-action-test" | jq . || echo "API test failed - this might be expected if the knowledge base is empty"
+        else
+          echo "No API endpoint found"
+        fi
+
+
+  notify:
+    name: Notify Deployment Status
+    needs: [terraform, serverless]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deployment Success
+      if: needs.terraform.result == 'success' && needs.serverless.result == 'success'
+      run: |
+        echo "Deployment Successful!"
+        echo "Knowledge Base ID: ${{ needs.terraform.outputs.knowledge_base_id }}"
+        echo "API Endpoint: ${{ needs.serverless.outputs.api_endpoint }}"
+
+    - name: Deployment Failed
+      if: needs.terraform.result == 'failure' || needs.serverless.result == 'failure'
+      run: |
+        echo "Deployment Failed!"
+        echo "Terraform status: ${{ needs.terraform.result }}"
+        echo "Serverless status: ${{ needs.serverless.result }}"
