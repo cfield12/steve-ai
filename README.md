@@ -1,10 +1,40 @@
-# AI Agent Knowledge Base - Infrastructure
+# Steve AI - Automated Knowledge Base Agent
+
+**Steve AI** is a complete automation solution that creates a fully functional AI agent powered by Amazon Bedrock. Simply provide your AWS credentials, upload your documents to S3, and you'll have a production-ready API that can answer questions about your data using advanced RAG (Retrieval-Augmented Generation) technology.
+
+## 🚀 What This Does
+
+This project **automatically creates**:
+- **AI Knowledge Base** - Powered by Amazon Bedrock with vector embeddings
+- **RESTful API** - Query your data through a simple HTTP endpoint
+- **Serverless Lambda** - Scales automatically with your usage
+- **Vector Search** - Uses OpenSearch for intelligent document retrieval
+- **Session Management** - Maintains conversation context
+
+## 📋 What You Need to Do
+
+1. **Configure AWS credentials** (one-time setup)
+
+2. **Run the deployment** (Terraform + Serverless)
+3. **Upload your documents** to the S3 bucket
+4. **Start asking questions** via the API endpoint
+
+## 🎯 Perfect For
+
+- **Document Q&A** - Ask questions about PDFs, text files, documentation
+- **Knowledge Management** - Create internal knowledge bases for teams
+- **Customer Support** - Build chatbots that know your product documentation
+- **Research Assistance** - Query large datasets and research papers
+- **Code Documentation** - Ask questions about your codebase and APIs
+
+## 🏗️ What Gets Built
 
 This project contains the complete infrastructure for an AI Agent Knowledge Base system, including:
 
 - **Terraform Configuration** - AWS infrastructure provisioning
-- **Serverless Framework** - Lambda API deployment
+- **Serverless Framework** - Lambda API deployment  
 - **S3 Storage** - Knowledge base data and Lambda layers
+- **GitHub Actions** - Automated CI/CD pipeline
 
 ## Architecture Overview
 
