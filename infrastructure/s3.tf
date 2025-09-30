@@ -42,7 +42,7 @@ resource "aws_s3_bucket_public_access_block" "knowledgebase_steve_pab" {
 resource "aws_s3_object" "dataset_folder" {
   bucket = aws_s3_bucket.knowledgebase_steve.id
   key    = "dataset/"
-  
+
   # This creates a folder by uploading an empty object
   content = ""
 }
@@ -51,16 +51,8 @@ resource "aws_s3_object" "dataset_folder" {
 resource "aws_s3_object" "output_folder" {
   bucket = aws_s3_bucket.knowledgebase_steve.id
   key    = "output/"
-  
+
   # This creates a folder by uploading an empty object
   content = ""
 }
 
-# Create lambdalayer folder
-resource "aws_s3_object" "lambdalayer_folder" {
-  bucket = aws_s3_bucket.knowledgebase_steve.id
-  key    = "lambdalayer/"
-  
-  # This creates a folder by uploading an empty object
-  content = ""
-}

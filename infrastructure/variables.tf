@@ -25,7 +25,7 @@ variable "tags" {
 variable "application_name" {
   description = "Name of application"
   type        = string
-  default     = "steve" 
+  default     = "steve"
 }
 
 variable "model_id" {

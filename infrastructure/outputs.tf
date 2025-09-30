@@ -23,11 +23,6 @@ output "dataset_folder_key" {
   value       = aws_s3_object.dataset_folder.key
 }
 
-output "lambdalayer_folder_key" {
-  description = "Key of the lambdalayer folder"
-  value       = aws_s3_object.lambdalayer_folder.key
-}
-
 output "output_folder_key" {
   description = "Key of the output folder"
   value       = aws_s3_object.output_folder.key
@@ -48,6 +43,6 @@ output "export_serverless_config" {
   description = "Export configuration for Serverless Framework"
   value = {
     knowledge_base_id = aws_bedrockagent_knowledge_base.steve_kb.id
-    s3_bucket_name   = aws_s3_bucket.knowledgebase_steve.bucket
+    s3_bucket_name    = aws_s3_bucket.knowledgebase_steve.bucket
   }
 }
