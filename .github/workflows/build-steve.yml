@@ -115,12 +115,8 @@ jobs:
         echo "AWS Region: ${{ inputs.aws_region }}"
       working-directory: ./infrastructure
 
-    - name: Install Serverless dependencies
-      run: npm install
-      working-directory: ./steve-ai
-
     - name: Deploy Serverless API
-      run: serverless deploy --verbose
+      run: serverless deploy --verbose --force
       working-directory: ./steve-ai
 
     - name: Get API Endpoint
