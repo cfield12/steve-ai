@@ -9,9 +9,10 @@ provider:
   name: aws
   runtime: python3.11
   stage: dev
-  region: eu-west-2
+  region: ${env:AWS_REGION, 'eu-west-2'}
   environment:
     KNOWLEDGE_BASE_ID: ${env:KNOWLEDGE_BASE_ID, self:custom.knowledgeBaseID}
+    AWS_REGION: ${env:AWS_REGION, 'eu-west-2'}
   iam:
     role:
       statements:

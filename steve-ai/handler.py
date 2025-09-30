@@ -3,6 +3,7 @@ import boto3
 import json
 import logging
 
+AWS_REGION = os.environ.get("AWS_REGION", "eu-west-2")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ logger.info("Environment variables: %s", os.environ)
 
 # create a boto3 bedrock client
 bedrock_agent_runtime_client = boto3.client(
-    "bedrock-agent-runtime", region_name="eu-west-2"
+    "bedrock-agent-runtime", region_name=AWS_REGION
 )
 
 
@@ -61,8 +62,7 @@ def lambda_handler(event, context):
 
     # Specify the model ID and construct its ARN. Update these placeholders as needed.
     model_id = "anthropic.claude-v2"
-    region = "eu-west-2"
-    model_arn = f"arn:aws:bedrock:{region}::foundation-model/{model_id}"
+    model_arn = f"arn:aws:bedrock:{AWS_REGION}::foundation-model/{model_id}"
 
     # Call the retrieve and generate function
     try:
