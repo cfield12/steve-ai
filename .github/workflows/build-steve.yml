@@ -28,6 +28,7 @@ jobs:
     outputs:
       knowledge_base_id: ${{ steps.terraform-output.outputs.knowledge_base_id }}
       knowledge_base_arn: ${{ steps.terraform-output.outputs.knowledge_base_arn }}
+      s3_bucket_id: ${{ steps.terraform-output.outputs.s3_bucket_id }}
     
     steps:
     - name: Checkout code
@@ -83,6 +84,7 @@ jobs:
       run: |
         echo "knowledge_base_id=$(terraform output -raw knowledge_base_id)" >> $GITHUB_OUTPUT
         echo "knowledge_base_arn=$(terraform output -raw knowledge_base_arn)" >> $GITHUB_OUTPUT
+        echo "s3_bucket_id=$(terraform output -raw s3_bucket_id)" >> $GITHUB_OUTPUT
       working-directory: ./infrastructure
 
     - name: Install zip utility
@@ -131,11 +133,12 @@ jobs:
       run: |
         # Set environment variables for Serverless deployment
         echo "KNOWLEDGE_BASE_ID=${{ needs.terraform.outputs.knowledge_base_id }}" >> $GITHUB_ENV
-        echo "S3_BUCKET_NAME=$(terraform output -raw s3_bucket_id)" >> $GITHUB_ENV
+        echo "S3_BUCKET_NAME=${{ needs.terraform.outputs.s3_bucket_id }}" >> $GITHUB_ENV
         echo "AWS_REGION=${{ inputs.aws_region }}" >> $GITHUB_ENV
 
         echo "Environment variables set for Serverless deployment"
         echo "Knowledge Base ID: ${{ needs.terraform.outputs.knowledge_base_id }}"
+        echo "S3 Bucket: ${{ needs.terraform.outputs.s3_bucket_id }}"
         echo "AWS Region: ${{ inputs.aws_region }}"
       working-directory: ./infrastructure
 
