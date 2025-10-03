@@ -99,7 +99,6 @@ jobs:
         rm -rf layer_root && mkdir -p layer_root/python/steve_ai
         rsync -a steve-ai/ layer_root/python/steve_ai/ --exclude knowledgebase_lambdalayer.zip || cp -r steve-ai/* layer_root/python/steve_ai/
         (cd layer_root && zip -r ../knowledgebase_lambdalayer.zip .)
-        cd ../
         ls -lh knowledgebase_lambdalayer.zip
         aws s3 cp knowledgebase_lambdalayer.zip s3://$BUCKET/lambdalayer/knowledgebase_lambdalayer.zip --region ${{ inputs.aws_region }}
 
