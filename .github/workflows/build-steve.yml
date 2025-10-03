@@ -59,8 +59,14 @@ jobs:
       working-directory: ./infrastructure
 
     - name: Terraform Apply
+      id: apply
       if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve tfplan
+      working-directory: ./infrastructure
+
+    - name: Rollback on failure (apply only)
+      if: steps.apply.outcome == 'failure'
+      run: terraform destroy -auto-approve
       working-directory: ./infrastructure
 
     - name: Terraform Plan (PR)
