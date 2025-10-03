@@ -122,10 +122,6 @@ resource "aws_iam_role_policy" "bedrock_kb_steve_kb_oss" {
   })
 }
 
-provider "opensearch" {
-  url         = aws_opensearchserverless_collection.steve_kb.collection_endpoint
-  healthcheck = false
-}
 
 resource "opensearch_index" "steve_kb" {
   name                           = "bedrock-knowledge-base-default-index"

@@ -1,6 +1,6 @@
 # Steve AI - Automated Knowledge Base Agent
 
-**Steve AI** is a complete automation solution that creates a fully functional AI agent powered by Amazon Bedrock. Simply provide your AWS credentials, upload your documents to S3, and you'll have a production-ready API that can answer questions about your data using advanced RAG (Retrieval-Augmented Generation) technology.
+**Steve AI** is a complete automation solution that creates a fully functional AI agent powered by Amazon Bedrock. Simply provide your **region**, **AWS_ACCESS_KEY_ID**, and **AWS_SECRET_ACCESS_KEY**, upload your documents to S3, and you'll have a production-ready API that can answer questions about your data using advanced RAG (Retrieval-Augmented Generation) technology.
 
 ## 🚀 What This Does
 
@@ -13,7 +13,10 @@ This project **automatically creates**:
 
 ## 📋 What You Need to Do
 
-1. **Configure AWS credentials** (one-time setup)
+1. **Set your AWS credentials** - Just provide:
+   - **Region** (e.g., `us-east-1`, `eu-west-2`)
+   - **AWS_ACCESS_KEY_ID** 
+   - **AWS_SECRET_ACCESS_KEY**
 
 2. **Run the deployment** (Terraform + Serverless)
 3. **Upload your documents** to the S3 bucket
@@ -69,7 +72,10 @@ This project contains the complete infrastructure for an AI Agent Knowledge Base
 
 - Terraform >= 1.0
 - Node.js >= 18.0.0 (for Serverless Framework)
-- AWS CLI configured with appropriate credentials
+- **AWS credentials** - Just need:
+  - **Region** (e.g., `us-east-1`, `eu-west-2`)
+  - **AWS_ACCESS_KEY_ID**
+  - **AWS_SECRET_ACCESS_KEY**
 - AWS account with S3, Bedrock, and OpenSearch permissions
 - Serverless Framework CLI
 
@@ -276,6 +282,12 @@ curl -s "https://xxxxxxxxxx.execute-api.eu-west-2.amazonaws.com/dev/?question=Ex
 2. **Permission Denied Errors:**
    ```bash
    # Ensure AWS credentials are configured
+   # Set your credentials as environment variables:
+   export AWS_ACCESS_KEY_ID="your-access-key"
+   export AWS_SECRET_ACCESS_KEY="your-secret-key"
+   export AWS_DEFAULT_REGION="your-region"
+   
+   # Or verify current configuration:
    aws configure list
    aws sts get-caller-identity
    ```
