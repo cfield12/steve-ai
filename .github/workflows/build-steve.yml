@@ -13,6 +13,9 @@ on:
         description: "AWS Region"
         required: true
         default: "eu-west-2"
+      serverless_access_key:
+        description: "Serverless Access Key"
+        required: true
 
 env:
   TF_VERSION: 1.6.0
@@ -124,6 +127,8 @@ jobs:
     - name: Deploy Serverless API
       run: serverless deploy --verbose --force
       working-directory: ./steve-ai
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ inputs.serverless_access_key }}
 
     - name: Get API Endpoint
       id: serverless-output
