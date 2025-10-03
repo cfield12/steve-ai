@@ -3,7 +3,7 @@ import boto3
 import json
 import logging
 
-AWS_REGION = os.environ.get("AWS_REGION", "eu-west-2")
+AWS_REGION = os.environ["AWS_REGION"]
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,9 +12,7 @@ logger.info("Starting the application")
 logger.info("Environment variables: %s", os.environ)
 
 # create a boto3 bedrock client
-bedrock_agent_runtime_client = boto3.client(
-    "bedrock-agent-runtime", region_name=AWS_REGION
-)
+bedrock_agent_runtime_client = boto3.client("bedrock-agent-runtime")
 
 
 def retrieveAndGenerate(question, kbId, model_arn, sessionId=None):

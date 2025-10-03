@@ -142,7 +142,7 @@ jobs:
       run: |
         if [ -n "${{ steps.serverless-output.outputs.api_endpoint }}" ]; then
           echo "Testing API endpoint: ${{ steps.serverless-output.outputs.api_endpoint }}"
-          curl -s "${{ steps.serverless-output.outputs.api_endpoint }}?question=Test%20question&session_id=github-action-test" | jq . || echo "API test failed - this might be expected if the knowledge base is empty"
+          curl -s "${{ steps.serverless-output.outputs.api_endpoint }}?question=Test%20question" | jq . || echo "API test failed - this might be expected if the knowledge base is empty"
         else
           echo "No API endpoint found"
         fi

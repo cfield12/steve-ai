@@ -56,3 +56,9 @@ resource "aws_s3_object" "output_folder" {
   content = ""
 }
 
+# Create lambdalayer folder
+resource "aws_s3_object" "lambdalayer_prefix" {
+  bucket  = aws_s3_bucket.knowledgebase_steve.id
+  key     = "lambdalayer/"
+  content = ""
+}

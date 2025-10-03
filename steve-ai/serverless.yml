@@ -12,7 +12,6 @@ provider:
   region: ${env:AWS_REGION, 'eu-west-2'}
   environment:
     KNOWLEDGE_BASE_ID: ${env:KNOWLEDGE_BASE_ID, self:custom.knowledgeBaseID}
-    AWS_REGION: ${env:AWS_REGION, 'eu-west-2'}
   iam:
     role:
       statements:
@@ -33,7 +32,7 @@ functions:
     memorySize: 256
     timeout: 60
     layers:
-      - { Ref: DeployKnowledgeBaseLambdaLayer }
+      - Ref: DeployKnowledgeBaseLambdaLayer
     events:
       - http:
           path: /
@@ -45,11 +44,8 @@ resources:
       Type: AWS::Lambda::LayerVersion
       Properties:
         LayerName: KnowledgeBaseLambdaLayer
-        Description: Knowledge Base Lambda Layer
         Content:
-          S3Bucket: ${self:custom.lambdaLayerS3BucketName}
+          S3Bucket: ${env:S3_BUCKET_NAME, self:custom.lambdaLayerS3BucketName}
           S3Key: lambdalayer/knowledgebase_lambdalayer.zip
         CompatibleRuntimes:
-          - python3.12
           - python3.11
-          - python3.10
