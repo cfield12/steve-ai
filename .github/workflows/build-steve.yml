@@ -98,7 +98,7 @@ jobs:
         touch lambdalayer/python/__init__.py
         (cd lambdalayer && zip -r ../knowledgebase_lambdalayer.zip .)
         aws s3 cp knowledgebase_lambdalayer.zip s3://$BUCKET/lambdalayer/knowledgebase_lambdalayer.zip --region ${{ inputs.aws_region }}
-      working-directory: ./steve-ai
+      working-directory: ./infrastructure
 
   serverless:
     name: Deploy Serverless API
@@ -133,7 +133,7 @@ jobs:
         echo "KNOWLEDGE_BASE_ID=${{ needs.terraform.outputs.knowledge_base_id }}" >> $GITHUB_ENV
         echo "S3_BUCKET_NAME=$(terraform output -raw s3_bucket_id)" >> $GITHUB_ENV
         echo "AWS_REGION=${{ inputs.aws_region }}" >> $GITHUB_ENV
-        
+
         echo "Environment variables set for Serverless deployment"
         echo "Knowledge Base ID: ${{ needs.terraform.outputs.knowledge_base_id }}"
         echo "AWS Region: ${{ inputs.aws_region }}"
