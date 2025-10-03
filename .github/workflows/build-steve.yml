@@ -85,6 +85,21 @@ jobs:
         echo "knowledge_base_arn=$(terraform output -raw knowledge_base_arn)" >> $GITHUB_OUTPUT
       working-directory: ./infrastructure
 
+    - name: Install zip utility
+      if: github.ref == 'refs/heads/main'
+      run: sudo apt-get update && sudo apt-get install -y zip
+
+    - name: Upload minimal Lambda Layer artifact
+      if: github.ref == 'refs/heads/main'
+      run: |
+        BUCKET=$(terraform output -raw s3_bucket_id)
+        echo "Using S3 bucket: $BUCKET"
+        mkdir -p lambdalayer/python
+        touch lambdalayer/python/__init__.py
+        (cd lambdalayer && zip -r ../knowledgebase_lambdalayer.zip .)
+        aws s3 cp knowledgebase_lambdalayer.zip s3://$BUCKET/lambdalayer/knowledgebase_lambdalayer.zip --region ${{ inputs.aws_region }}
+      working-directory: ./steve-ai
+
   serverless:
     name: Deploy Serverless API
     needs: terraform
