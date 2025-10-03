@@ -78,6 +78,7 @@ This project contains the complete infrastructure for an AI Agent Knowledge Base
   - **AWS_SECRET_ACCESS_KEY**
 - AWS account with S3, Bedrock, and OpenSearch permissions
 - Serverless Framework CLI
+- Serverless account and access key: Create an access key in the Serverless Dashboard and provide it to CI as the `serverless_access_key` input (required by the GitHub Action).
 
 ## Usage
 
@@ -145,6 +146,8 @@ provider:
    ```bash
    serverless deploy
    ```
+
+   Note: In GitHub Actions, you must provide a Serverless access token. The workflow requires a `serverless_access_key` input, which should be a Serverless access key generated from your Serverless account. This is exposed to the deploy step as `SERVERLESS_ACCESS_KEY`.
 
 2. **Deploy to specific stage:**
    ```bash
