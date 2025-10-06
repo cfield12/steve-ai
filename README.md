@@ -80,7 +80,34 @@ This project contains the complete infrastructure for an AI Agent Knowledge Base
 - Serverless Framework CLI
 - Serverless account and access key: Create an access key in the Serverless Dashboard and provide it to CI as the `serverless_access_key` input (required by the GitHub Action).
 
-## Usage
+### GitHub Actions (Reusable Workflow)
+
+Use the reusable workflow in this repo to provision and deploy via CI/CD.
+
+1. Copy this repository and create your own Git repo
+   ```bash
+   git clone <this-repo-url> steve
+   cd steve
+   rm -rf .git
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin <your-new-repo-url>
+   git push -u origin main
+   ```
+
+2. In your GitHub repository, add the following Actions secrets (Settings → Secrets and variables → Actions)
+   - `AWS_REGION`
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `SERVERLESS_ACCESS_KEY`
+
+3. Push to `main` to trigger `.github/workflows/build-steve-main.yml`
+   - This calls the reusable workflow `.github/workflows/build-steve-reusable-workflow.yml`
+   - On success, the job output will include the deployed API endpoint
+
+## Manual Usage
 
 1. **Initialize Terraform:**
    ```bash
