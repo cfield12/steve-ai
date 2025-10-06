@@ -1,25 +1,6 @@
 name: Build and Deploy Steve AI Reusable Workflow
 
-on:
-  workflow_call:
-    inputs:
-      aws_access_key_id:
-        description: "AWS Access Key ID"
-        required: true
-        type: string
-      aws_secret_access_key:
-        description: "AWS Secret Access Key"
-        required: true
-        type: string
-      aws_region:
-        description: "AWS Region"
-        required: true
-        default: "eu-west-2"
-        type: string
-      serverless_access_key:
-        description: "Serverless Access Key"
-        required: true
-        type: string
+on: workflow_call
 
 env:
   TF_VERSION: 1.6.0
@@ -41,9 +22,9 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ inputs.aws_access_key_id }}
-        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
-        aws-region: ${{ inputs.aws_region }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
@@ -104,7 +85,7 @@ jobs:
         rsync -a steve-ai/ layer_root/python/steve_ai/ --exclude knowledgebase_lambdalayer.zip || cp -r steve-ai/* layer_root/python/steve_ai/
         (cd layer_root && zip -r ../knowledgebase_lambdalayer.zip .)
         ls -lh knowledgebase_lambdalayer.zip
-        aws s3 cp knowledgebase_lambdalayer.zip s3://$BUCKET/lambdalayer/knowledgebase_lambdalayer.zip --region ${{ inputs.aws_region }}
+        aws s3 cp knowledgebase_lambdalayer.zip s3://$BUCKET/lambdalayer/knowledgebase_lambdalayer.zip --region ${{ secrets.AWS_REGION }}
 
   serverless:
     name: Deploy Serverless API
@@ -126,9 +107,9 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ inputs.aws_access_key_id }}
-        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
-        aws-region: ${{ inputs.aws_region }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Install Serverless Framework
       run: npm install -g serverless
@@ -138,19 +119,19 @@ jobs:
         # Set environment variables for Serverless deployment
         echo "KNOWLEDGE_BASE_ID=${{ needs.terraform.outputs.knowledge_base_id }}" >> $GITHUB_ENV
         echo "S3_BUCKET_NAME=${{ needs.terraform.outputs.s3_bucket_id }}" >> $GITHUB_ENV
-        echo "AWS_REGION=${{ inputs.aws_region }}" >> $GITHUB_ENV
+        echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
 
         echo "Environment variables set for Serverless deployment"
         echo "Knowledge Base ID: ${{ needs.terraform.outputs.knowledge_base_id }}"
         echo "S3 Bucket: ${{ needs.terraform.outputs.s3_bucket_id }}"
-        echo "AWS Region: ${{ inputs.aws_region }}"
+        echo "AWS Region: ${{ secrets.AWS_REGION }}"
       working-directory: ./infrastructure
 
     - name: Deploy Serverless API
       run: serverless deploy --verbose --force
       working-directory: ./steve-ai
       env:
-        SERVERLESS_ACCESS_KEY: ${{ inputs.serverless_access_key }}
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
     - name: Get API Endpoint
       id: serverless-output

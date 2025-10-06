@@ -8,8 +8,4 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build-steve-reusable-workflow.yml
-    with:
-      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      aws_region: ${{ secrets.AWS_REGION }}
-      serverless_access_key: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+    secrets: inherit
