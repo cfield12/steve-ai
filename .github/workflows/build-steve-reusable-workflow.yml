@@ -1,21 +1,25 @@
-name: Build and Deploy Steve AI
+name: Build and Deploy Steve AI Reusable Workflow
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       aws_access_key_id:
         description: "AWS Access Key ID"
         required: true
+        type: string
       aws_secret_access_key:
         description: "AWS Secret Access Key"
         required: true
+        type: string
       aws_region:
         description: "AWS Region"
         required: true
         default: "eu-west-2"
+        type: string
       serverless_access_key:
         description: "Serverless Access Key"
         required: true
+        type: string
 
 env:
   TF_VERSION: 1.6.0
